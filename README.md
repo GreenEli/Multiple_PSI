@@ -6,7 +6,7 @@ The implementation has been tested on Linux. To download the code and compile, r
 ```
 $ git clone --recursive https://github.com/GreenEli/Multiple-PSI.git
 $ cd multiple-PSI
-$ bash compile
+$ bash compile0
 ```
 
 ## Running the Code
