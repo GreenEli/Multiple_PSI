@@ -15,11 +15,11 @@ cd ./boost
 ./bootstrap.sh
 ./b2 stage --with-system --with-thread link=static -mt
 cd ../
-# bash miracl.get
-# cd ../../..
+bash miracl.get
+cd ../../..
 
-# cmake -D ENABLE_MIRACL=ON .
-# make
-# cd ../Multiple_PSI
-# cmake .
-# make
+cmake -D ENABLE_MIRACL=ON .
+make
+cd ../Multiple_PSI
+cmake .
+make
