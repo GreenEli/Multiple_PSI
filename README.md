@@ -38,7 +38,7 @@ $ ./bin/PSI_test -r 0 -ss 24 -rs 24 -ss1 16 -rs1 16 -w 636 -h 24 -hash 12 -w1 60
 
 ```
 ## To Do
-Note that we have completed the implementation in the main part of our protocol, we will update the rest in future. And the readability of current version is not good, further updates will be made to enhance it.
+Note that we have completed the implementation in the main part of our protocol, we will update the rest in future. And further updates will be made to enhance the readability.
 
 ## Help
 For any questions on building or running the library, please create git issues, or contact [`Qiang Liu`] liuqiang2022 at iie do ac do cn.
