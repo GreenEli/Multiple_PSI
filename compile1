@@ -1,5 +1,5 @@
+# A convenient version to compile.
 #!/bin/bash
-
 # cd ..
 # git clone --recursive https://github.com/osu-crypto/libOTe.git
 # cd libOTe
