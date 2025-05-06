@@ -1,8 +1,6 @@
 #include "PsiSender.h"
-#include<sys/mman.h>
-// #include <stdlib.h>  
+#include<sys/mman.h>  
 #include <iostream>
-// #include <istream>
 #include <cstdlib>
 #include <bitset>
 
@@ -22,9 +20,6 @@ namespace PSI {
 			auto heightInBytes = (height + 7) / 8;
 			auto widthInBytes = (width + 7) / 8;
 			auto locationInBytes = (logHeight + 7) / 8;//0001|1110|0101|1010|...
-			// if(locationInBytes==4){
-			// 	locationInBytes=3;
-			// }
 			auto senderSizeInBytes = (senderSize + 7) / 8;
 			auto shift = (1 << logHeight) - 1;
 			auto widthBucket1 = sizeof(block) / locationInBytes;//which is familier with this as 0001|1100|0101|1000|...|A Batchnorm
@@ -39,9 +34,6 @@ namespace PSI {
 			// prng.get(choices.data(), choices.sizeBytes());
 			otExtReceiver.receive(choices, otMessages, prng, ch);
 			
-			// cout<<"SEND choices[0] is "<<int(choices[0])<<" \n";
-			// cout<<"SEND choices[1] is "<<int(choices[1])<<" \n";
-			// std::cout << "Sender base OT finished\n";
 			timer.setTimePoint("Sender base OT finished");
 
 
@@ -102,25 +94,13 @@ namespace PSI {
 			// std::cout << "Sender set transformed\n";
 			timer.setTimePoint("Sender set transformed");
 
-
-			// // 写入Matrix C into文件 output_C.txt.
-			// int len = sizeof(matrixC)*150;
-			// int len1 = sizeof(matrixC);
-			// int len2 = sizeof(matrixC[0]);
 			int len2 = heightInBytes;
 			int len1 = len2*widthBucket1;
 			int len = len1*widthdivide;
-			// 打开文件
-			// int fd=open("/home/qiqiang6/Desktop/EX_PSIOT_Ex/OPRF-PSI/PSI/Output/output_D.txt", O_RDWR|O_CREAT, 00777);
 			int fd_c=open("/tmp/output_C.txt", O_RDWR|O_CREAT, 00777);
-			// int fd=open("/home/qiqiang6/Desktop/EX_PSIOT_Ex/OPRF-PSI/PSI/Output/output.txt", O_RDWR, 0644);
-			// u8* addr;
 			u8* addr_c;
 			// lseek将文件指针往后移动file_size-1位
-			// lseek(fd,len-1,SEEK_END);
 			lseek(fd_c,len-1,SEEK_END);   
-			// 从指针处写入一个空字符；mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
-			// write(fd, "", 1);
 			write(fd_c, "", 1);
 			// 使用mmap函数建立内存映射
 			// addr = (u8*)mmap(NULL, len, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);
@@ -169,7 +149,6 @@ namespace PSI {
 						}
 					}
 				}
-				// std::cout <<t<< " Sender is 0\n";
 				//Relate yuansu to copy into another way
 				for(int k=1;k<widthBucket1+1;k++){
 					memcpy(addr_c+(k-1)*len2+(t-1)*len1, matrixC[k-1], len2);
@@ -188,12 +167,7 @@ namespace PSI {
 			}
 
 			// 内存映射建立好了，此时可以关闭文件了
-			// close(fd);
 			close(fd_c);
-			// // 把data复制到addr里
-			// // memcpy(addr, data, len);
-			// 解除映射
-			// munmap(addr, len);
 			munmap(addr_c, len);
 			// std::cout << "Sender transposed hash input computed\n";
 			timer.setTimePoint("Sender transposed hash input computed");
@@ -239,10 +213,6 @@ namespace PSI {
 			timer.setTimePoint("Sender hash outputs computed and sent");
 
 			std::cout << timer;
-
-			// ch.recv(recvBuff, (up - low) * hashLengthInBytes);
-			// u8* sentBuff = new u8[bucket2 * hashLengthInBytes];
-			// ch.recv(sentBuff, bucket2 * hashLengthInBytes);
 		}
 		else{
 			const block commonSeed1 = oc::toBlock(234567);
@@ -256,8 +226,6 @@ namespace PSI {
 			for (auto i = 0; i < receiverSize_To; ++i) {
 				receiverSet[i] = prng1.get<block>();
 			}
-			// u8* sentBuff = new u8[bucket2 * hashLengthInBytes];
-			// ch.recv(sentBuff, bucket2 * hashLengthInBytes);
 		//////////Syn The Time ///////////////////////////
 
 			u8* SynTime = new u8[hashLengthInBytes];
@@ -283,10 +251,6 @@ namespace PSI {
 			auto SelfheightInBytes = (height + 7) / 16;
 			auto widthInBytes = (width + 7) / 8;
 			auto locationInBytes = (logHeight + 7) / 8;
-			// if(locationInBytes==4){
-			// 	locationInBytes=3;
-			// }
-			// auto receiverSizeInBytes = (receiverSize + 7) / 8;
 			auto receiverSizeInBytes = (receiverSize_To + 7) / 8;
 			auto shift = (1 << logHeight) - 1;
 			auto widthBucket1 = sizeof(block) / locationInBytes;
@@ -294,11 +258,7 @@ namespace PSI {
 
 			u64 sentData = ch.getTotalDataSent();
 			u64 recvData = ch.getTotalDataRecv();
-			u64 totalData = sentData + recvData;
-			
-			// std::cout << "Receiver sent communication: " << sentData / std::pow(2.0, 20) << " MB\n";
-			// std::cout << "Receiver received communication: " << recvData / std::pow(2.0, 20) << " MB\n";
-			// std::cout << "BaseOT_Before_Receiver total communication: " << totalData / std::pow(2.0, 20) << " MB\n";		
+			u64 totalData = sentData + recvData;	
 			
 			///////////////////// Base OTs ///////////////////////////
 			
@@ -311,17 +271,6 @@ namespace PSI {
 
 			// std::cout << "Receiver base OT finished\n";
 			timer.setTimePoint("Receiver base OT finished");
-
-	// TEST ------------------------------------------------------------------------------
-			
-			// sentData = ch.getTotalDataSent();
-			// recvData = ch.getTotalDataRecv();
-			// totalData = sentData + recvData;
-			
-			// // std::cout << "Receiver sent communication: " << sentData / std::pow(2.0, 20) << " MB\n";
-			// // std::cout << "Receiver received communication: " << recvData / std::pow(2.0, 20) << " MB\n";
-			// std::cout << "BaseOT_Later_Receiver total communication: " << totalData / std::pow(2.0, 20) << " MB\n";
-	// TEST ------------------------------------------------------------------------------- 
 			
 			//////////// Initialization ///////////////////
 			
@@ -395,27 +344,16 @@ namespace PSI {
 			int len = len1*widthdivide;
 			int lenr = receiverSize_To*hashLengthInBytes;
 			int lenhashBatch=hashLengthInBytes*bucket2;
-			// int lens = senderSize*hashLengthInBytes;
-			// int len2 = sizeof(matrixDelta[0]);
 			// 打开文件
 			int fd=open("/tmp/output_D1.txt", O_RDWR|O_CREAT, 00777);
 			int fd_a=open("/tmp/output_A1.txt", O_RDWR|O_CREAT, 00777);
 			int fd_r=open("/tmp/output_R1.txt", O_RDWR|O_CREAT, 00777);
-			// int fd_s=open("/home/qiqiang6/Desktop/EX_PSIOT_Ex/OPRF-PSI/PSI/Output/output_S.txt", O_RDWR|O_CREAT, 00777);
-			// int fd=open("/home/qiqiang6/Desktop/EX_PSIOT_Ex/OPRF-PSI/PSI/Output/output.txt", O_RDWR, 0644);
 			u8* addr;
 			u8* addr_a;
-			u8* addr_r;
-			// u8* addr_s;
-			// u8* addr1; 
-			// u8* addr2;
-			// lseek将文件指针往后移动file_size-1位
-			// lseek(fd,len-1,SEEK_END);
-			// lseek(fd_a,len-1,SEEK_END);   
+			u8* addr_r; 
 			lseek(fd,len-1,SEEK_END);
 			lseek(fd_a,len-1,SEEK_END);  
 			lseek(fd_r,lenr-1,SEEK_END); 
-			// lseek(fd_s,lens-1,SEEK_END); 
 			// 从指针处写入一个空字符；mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
 			write(fd, "", 1);
 			write(fd_a, "", 1);
@@ -423,19 +361,14 @@ namespace PSI {
 			// write(fd_s, "", 1);
 			// 使用mmap函数建立内存映射
 			addr = (u8*)mmap(NULL, len, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);
-			// addr1 = (u8*)mmap(NULL, len1, PROT_READ|PROT_WRITE,MAP_SHARED, fd, len1);
 			addr_a = (u8*)mmap(NULL, len, PROT_READ|PROT_WRITE,MAP_SHARED, fd_a, 0);
-			// addr2 = (u8*)mmap(NULL, len1, PROT_READ|PROT_WRITE,MAP_SHARED, fd_a, len1);
 			addr_r = (u8*)mmap(NULL, lenr, PROT_READ|PROT_WRITE,MAP_SHARED, fd_r, 0);
-			// addr_s = (u8*)mmap(NULL, lens, PROT_READ|PROT_WRITE,MAP_SHARED, fd_s, 0);
 			int t=0;
 			for (auto wLeft = 0; wLeft < width; wLeft += widthBucket1) {
 				auto wRight = wLeft + widthBucket1 < width ? wLeft + widthBucket1 : width;
 				auto w = wRight - wLeft;
 				t++;
-				// cout<<"The number of widthbuckets is "<<t<<"\n";
 				//////////// Compute random locations (transposed) ////////////////
-				// std::cout <<t<< " Receiver is \n";
 				commonPrng.get((u8*)&commonKey, sizeof(block));
 				commonAes.setKey(commonKey);
 
@@ -472,21 +405,6 @@ namespace PSI {
 					memcpy(addr+(k-1)*len2+(t-1)*len1, matrixDelta[k-1], len2);
 					// std::cout <<k<< " OK\n";
 				}
-				// std::cout <<t<< " Receiver is 3\n";
-				// memcpy(addr+(t-1)*len1, matrixDelta, len1);
-				// std::cout <<"The Compare matrixDelta[0][0] is "<< int(matrixDelta[0][0])<<"\n";
-				// std::cout <<"The Compare addr[("<<len1_STR*(t-1)<<")] is "<< int(addr[0+len1_STR*(t-1)])<<"\n";
-				// memcpy(addr, matrixDelta, len1);
-				// memcpy(addr, matrixDelta, len1);
-				// if(t<4){
-				// 	std::cout <<"The Write matrixD[0+("<<(t-1)<<")][0] is "<< int(matrixDelta[0][1])<<"\n";
-				// }
-				// memcpy(matrixDelta,addr+(t-1)*len1,len1);
-				// if(t<4){
-				// 	std::cout <<"The Write_copy matrixD[0+("<<(t-1)<<")][0] is "<< int(matrixDelta[0][0])<<"\n";
-				// 	// cout<<"True len is "<<len<<" and len1 is"<<len1<<" and len2 is "<<len2<<" and widthbucket is "<<widthBucket1<<" \n";
-				// }
-				
 				
 				//////////////// Compute matrix A & sent matrix ///////////////////////
 
@@ -509,7 +427,6 @@ namespace PSI {
 					ch.asyncSend(sentMatrix[i], heightInBytes);
 					
 				}
-				// std::cout <<t<< " Receiver is 4\n";
 				for(int k=1;k<widthBucket1+1;k++){
 					memcpy(addr_a+(k-1)*len2+(t-1)*len1, matrixA[k-1], len2);
 				}
@@ -521,28 +438,14 @@ namespace PSI {
 						auto location = (*(u32*)(transLocations[i] + j * locationInBytes)) & shift;
 						
 						transHashInputs[i + wLeft][j >> 3] |= (u8)((bool)(matrixA[i][location >> 3] & (1 << (location & 7)))) << (j & 7);
-						// if(j%1000000==0){
-						// cout<<s<<" counter c2 is"<<++c2<<" \n";
-						// }
 					}		
 				}
 			}
 			
-			// for(int j=1;j<6;j++){
-			// 	// j++;
-			// 	memcpy(matrixA,addr2,len1);
-			// 	std::cout <<"The Write_copy2 matrixA[0+("<<(j-1)<<")][0] is "<< int(matrixA[0][j-1])<<"\n";
-			// 	// cout<<"True len is "<<len<<" and len1 is"<<len1<<" and len2 is "<<len2<<" and widthbucket is "<<widthBucket1<<" \n";
-			// }
 
 			// 内存映射建立好了，此时可以关闭文件了, Put This into Final
 			close(fd);
 			close(fd_a);
-			// // 把data复制到addr里
-			// // memcpy(addr, data, len);
-			// 解除映射
-			// munmap(addr, len);
-			// munmap(addr_a, len);
 			munmap(addr, len);
 			munmap(addr_a, len);
 
@@ -616,12 +519,7 @@ namespace PSI {
 				}
 			}
 			
-			// if (psi == 100) {
-			// 	std::cout << "Receiver intersection computed - correct!\n";
-			// }
-			// else{
 			std::cout << "Receiver intersection computed"<< psi <<"- correct!\n";
-			// }
 			timer.setTimePoint("Receiver intersection computed");
 			
 			
@@ -639,12 +537,7 @@ namespace PSI {
 				
 			}
 		}
-		////////////Syn the Time--------------/////////////
-		// u8* transHashInputsSyn[2];//receiver trans.
-		// for (auto i = 0; i < 2; ++i) {
-		// 	transHashInputsSyn[i] = new u8[hashLengthInBytes];
-		// 	memset(transHashInputsSyn[i], 0, hashLengthInBytes);
-		// }			
+		////////////Syn the Time--------------/////////////		
 		u8* SynTime = new u8[hashLengthInBytes];		
 		memset( SynTime, 0, hashLengthInBytes);
 		ch.asyncSend(SynTime, hashLengthInBytes);//yipiyipi send to receiver.
@@ -663,18 +556,11 @@ namespace PSI {
 			ch.recv(SynTime, hashLengthInBytes);
 			///////////Syn the TIME ///////////////////////////
 			Timer timer;
-			// char *savePath_c = "/tmp/output_C.txt";
-			// if(remove(savePath_c)==0){
-			// cout<<"The path is delete successfully\n";
-			// }
 			timer.setTimePoint("Sender start");
 			
 			auto heightInBytes = (height + 7) / 8;
 			auto widthInBytes = (width + 7) / 8;
 			auto locationInBytes = (logHeight + 7) / 8;//0001|1110|0101|1010|...
-			// if(locationInBytes==4){
-			// 	locationInBytes=3;
-			// }
 			auto senderSizeInBytes = (senderSize1 + 7) / 8;
 			auto shift = (1 << logHeight) - 1;
 			auto widthBucket1 = sizeof(block) / locationInBytes;//which is familier with this as 0001|1100|0101|1000|...|A Batchnorm
@@ -689,22 +575,6 @@ namespace PSI {
 			for (auto i = 100; i < senderSize1; ++i) {
 				senderSet[i] = prng1.get<block>();
 			}
-
-			// //////////////////// Base OTs /////////////////////////////////
-			
-			// IknpOtExtReceiver otExtReceiver;
-			// otExtReceiver.genBaseOts(prng, ch);
-			// // BitVector choices(width);
-			// std::vector<block> otMessages(width);
-			// // prng.get(choices.data(), choices.sizeBytes());
-			// otExtReceiver.receive(choices, otMessages, prng, ch);
-			
-			// // cout<<"SEND choices[0] is "<<int(choices[0])<<" \n";
-			// // cout<<"SEND choices[1] is "<<int(choices[1])<<" \n";
-			// // std::cout << "Sender base OT finished\n";
-			// timer.setTimePoint("Sender base OT finished");
-
-
 			////////////// Initialization //////////////////////
 			
 			PRNG commonPrng(commonSeed);
@@ -753,7 +623,6 @@ namespace PSI {
 				aesInput[i] = *(block*)h1Output;
 				sendSet[i] = *(block*)(h1Output + sizeof(block));
 			}
-			//Aes(h1())is OVER.
 			commonAes.ecbEncBlocks(aesInput, senderSize1, aesOutput);
 			for (auto i = 0; i < senderSize1; ++i) {
 				sendSet[i] ^= aesOutput[i];
@@ -764,26 +633,13 @@ namespace PSI {
 
 
 			// // 写入Matrix C into文件 output_C.txt.
-			// int len = sizeof(matrixC)*150;
-			// int len1 = sizeof(matrixC);
-			// int len2 = sizeof(matrixC[0]);
 			int len2 = heightInBytes;
 			int len1 = len2*widthBucket1;
 			int len = len1*widthdivide;
 			// 打开文件
-			// int fd=open("/home/qiqiang6/Desktop/EX_PSIOT_Ex/OPRF-PSI/PSI/Output/output_D.txt", O_RDWR|O_CREAT, 00777);
 			int fd_c=open("/tmp/output_C.txt", O_RDWR|O_CREAT, 00777);
-			// int fd=open("/home/qiqiang6/Desktop/EX_PSIOT_Ex/OPRF-PSI/PSI/Output/output.txt", O_RDWR, 0644);
-			// u8* addr;
 			u8* addr_c;
-			// lseek将文件指针往后移动file_size-1位
-			// // lseek(fd,len-1,SEEK_END);
-			// lseek(fd_c,len-1,SEEK_END);   
-			// // 从指针处写入一个空字符；mmap不能扩展文件长度，这里相当于预先给文件长度，准备一个空架子
-			// // write(fd, "", 1);
-			// write(fd_c, "", 1);
 			// 使用mmap函数建立内存映射
-			// addr = (u8*)mmap(NULL, len, PROT_READ|PROT_WRITE,MAP_SHARED, fd, 0);
 			addr_c = (u8*)mmap(NULL, len, PROT_READ|PROT_WRITE,MAP_SHARED, fd_c, 0);
 			int t=0;
 			for (auto wLeft = 0; wLeft < width; wLeft += widthBucket1) {
@@ -829,14 +685,8 @@ namespace PSI {
 			}
 
 			// 内存映射建立好了，此时可以关闭文件了
-			// close(fd);
 			close(fd_c);
-			// // 把data复制到addr里
-			// // memcpy(addr, data, len);
-			// 解除映射
-			// munmap(addr, len);
 			munmap(addr_c, len);
-			// std::cout << "Sender transposed hash input computed\n";
 			timer.setTimePoint("Sender transposed hash input computed");
 
 			/////////////////// Compute hash outputs ///////////////////////////
@@ -902,18 +752,6 @@ namespace PSI {
 				cout<<"---------------------------------------The prepare process---------------------------------------\n";
 				cout<<"---------------------------------------The prepare process---------------------------------------\n";
 				cout<<"---------------------------------------The prepare process---------------------------------------\n\n\n";
-				// auto heightInBytes = (height + 7) / 8;
-				// auto SelfheightInBytes = (height + 7) / 16;
-				// auto widthInBytes = (width + 7) / 8;
-				// auto locationInBytes = (logHeight + 7) / 8;
-				// // if(locationInBytes==4){
-				// // 	locationInBytes=3;
-				// // }
-				// // auto receiverSizeInBytes = (receiverSize + 7) / 8;
-				// // auto receiverSizeInBytes = (receiverSize + 7) / 8;
-				// auto shift = (1 << logHeight) - 1;
-				// auto widthBucket1 = sizeof(block) / locationInBytes;
-				// int widthdivide=width/widthBucket1+1;
 
 				u64 sentData = ch.getTotalDataSent();
 				u64 recvData = ch.getTotalDataRecv();
@@ -926,10 +764,7 @@ namespace PSI {
 				RandomOracle H(hashLengthInBytes);
 				u8 hashOutput[sizeof(block)];
 				std::unordered_map<u64, std::vector<std::pair<block, u32>>> allHashes;
-				// u8* hashInputs[bucket2];
-				// for (auto i = 0; i < bucket2; ++i) {
-				// 	hashInputs[i] = new u8[widthInBytes];
-				// }
+
 				// // 写入Matrix D into文件 output_D.txt.
 				int lenr = receiverSize_To*hashLengthInBytes;
 				int lenhashBatch=hashLengthInBytes*bucket2;
@@ -952,7 +787,6 @@ namespace PSI {
 					ch.recv(recvBuff, (up - low) * hashLengthInBytes);
 					for (auto j = low; j < up; ++j) {
 						memcpy(hashOutput, recvBuff+(j-low)*hashLengthInBytes, hashLengthInBytes);
-						// memcpy(hashOutput, addr_r+(j-low)*hashLengthInBytes+(s1-1)*lenhashBatch, hashLengthInBytes);
 						allHashes[*(u64*)hashOutput].push_back(std::make_pair(*(block*)hashOutput, j));
 					}
 				}
@@ -991,12 +825,7 @@ namespace PSI {
 				close(fd_r);
 				// 解除映射
 				munmap(addr_r, lenr);
-				// if (psi == 100) {
-				// 	std::cout << "Receiver intersection computed - correct!\n";
-				// }
-				// else{
 				std::cout << "Receiver intersection computed"<< psi <<"- correct!\n";
-				// }
 				timer.setTimePoint("Receiver intersection computed");
 				
 				
@@ -1035,7 +864,6 @@ namespace PSI {
 			}
 			
 			// u8* sentBuff = new u8[bucket2 * hashLengthInBytes];
-			// ch.recv(sentBuff, bucket2 * hashLengthInBytes);
 		//////////Syn The Time ///////////////////////////
 
 			u8* SynTime = new u8[hashLengthInBytes];
@@ -1054,10 +882,6 @@ namespace PSI {
 			auto SelfheightInBytes = (height1 + 7) / 16;
 			auto widthInBytes = (width1 + 7) / 8;
 			auto locationInBytes = (logHeight1 + 7) / 8;
-			// if(locationInBytes==4){
-			// 	locationInBytes=3;
-			// }
-			// auto receiverSizeInBytes = (receiverSize + 7) / 8;
 			auto receiverSizeInBytes = (receiverSize1_To + 7) / 8;
 			auto shift = (1 << logHeight1) - 1;
 			auto widthBucket1 = sizeof(block) / locationInBytes;
@@ -1066,10 +890,7 @@ namespace PSI {
 			u64 sentData = ch.getTotalDataSent();
 			u64 recvData = ch.getTotalDataRecv();
 			u64 totalData = sentData + recvData;
-			
-			// std::cout << "Receiver sent communication: " << sentData / std::pow(2.0, 20) << " MB\n";
-			// std::cout << "Receiver received communication: " << recvData / std::pow(2.0, 20) << " MB\n";
-			// std::cout << "BaseOT_Before_Receiver total communication: " << totalData / std::pow(2.0, 20) << " MB\n";		
+					
 			
 			///////////////////// Base OTs ///////////////////////////
 			
@@ -1082,17 +903,6 @@ namespace PSI {
 
 			// std::cout << "Receiver base OT finished\n";
 			timer.setTimePoint("Receiver base OT finished");
-
-	// TEST ------------------------------------------------------------------------------
-			
-			// sentData = ch.getTotalDataSent();
-			// recvData = ch.getTotalDataRecv();
-			// totalData = sentData + recvData;
-			
-			// // std::cout << "Receiver sent communication: " << sentData / std::pow(2.0, 20) << " MB\n";
-			// // std::cout << "Receiver received communication: " << recvData / std::pow(2.0, 20) << " MB\n";
-			// std::cout << "BaseOT_Later_Receiver total communication: " << totalData / std::pow(2.0, 20) << " MB\n";
-	// TEST ------------------------------------------------------------------------------- 
 			
 			//////////// Initialization ///////////////////
 			
@@ -1155,16 +965,6 @@ namespace PSI {
 				recvSet[i] ^= aesOutput[i];
 			}
 			
-			// std::cout << "Receiver set transformed\n";
-			// std::cout<<"R receiverSet[0][0] is "<<int(receiverSet[0][0])<<"\n";
-			// std::cout<<"R receiverSet[1][1] is "<<int(receiverSet[1][1])<<"\n";
-			// std::cout<<"R receiverSet[2][2] is "<<int(receiverSet[2][2])<<"\n";
-			// std::cout<<"R h1Output[0] is "<<int(h1Output[0])<<"\n";
-			// std::cout<<"R h1Output[1] is "<<int(h1Output[1])<<"\n";
-			// std::cout<<"R h1Output[2] is "<<int(h1Output[2])<<"\n";	
-			// std::cout<<"R recvSet[0][2] is "<<int(recvSet[0][2])<<"\n";
-			// std::cout<<"R recvSet[1][2] is "<<int(recvSet[1][2])<<"\n";
-			// std::cout<<"R recvSet[2][2] is "<<int(recvSet[2][2])<<"\n";
 			timer.setTimePoint("Receiver set transformed");
 
 
@@ -1175,7 +975,6 @@ namespace PSI {
 				t++;
 				// cout<<"The number of widthbuckets is "<<t<<"\n";
 				//////////// Compute random locations (transposed) ////////////////
-				// std::cout <<t<< " Receiver is \n";
 				commonPrng.get((u8*)&commonKey, sizeof(block));
 				commonAes.setKey(commonKey);
 
@@ -1210,12 +1009,7 @@ namespace PSI {
 				
 				//////////////// Compute matrix A & sent matrix ///////////////////////
 
-				// memcpy(matrixDelta,addr+(t-1)*len1,len1);
-
 				u8* sentMatrix[w];
-				// if(t%5==0){
-				// cout<<t<<" counter qiant is  "<<t<<" \n";
-				// }
 				for (auto i = 0; i < w; ++i) {
 					PRNG prng(otMessages[i + wLeft][0]);
 					prng.get(matrixA[i], heightInBytes);
@@ -1231,9 +1025,6 @@ namespace PSI {
 					ch.asyncSend(sentMatrix[i], heightInBytes);
 					
 				}
-				// if(t%5==0){
-				// cout<<t<<" counter hout is  "<<t<<" \n";
-				// }
 
 
 				///////////////// Compute hash inputs (transposed) /////////////////////
@@ -1243,22 +1034,10 @@ namespace PSI {
 						auto location = (*(u32*)(transLocations[i] + j * locationInBytes)) & shift;
 						
 						transHashInputs[i + wLeft][j >> 3] |= (u8)((bool)(matrixA[i][location >> 3] & (1 << (location & 7)))) << (j & 7);
-						// if(j%1000000==0){
-						// cout<<s<<" counter c2 is"<<++c2<<" \n";
-						// }
 					}		
 				}
-				// if(t%10==0){
-				// cout<<t<<" counter Finalt is  "<<t<<" \n";
-				// }
 			}
-				// std::cout <<t<< " Receiver is 0\n";
-			// 	std::cout<<"R transHashInputs[0][2] is "<<int(transHashInputs[0][2])<<"\n";
-			// 	std::cout<<"R transHashInputs[1][2] is "<<int(transHashInputs[1][2])<<"\n";
-			// 	std::cout<<"R transHashInputs[2][2] is "<<int(transHashInputs[2][2])<<"\n";
-			
 
-			// std::cout << "Receiver matrix sent and transposed hash input computed\n";
 			timer.setTimePoint("Receiver matrix sent and transposed hash input computed");
 			
 			/////////////////// Compute hash outputs ///////////////////////////
@@ -1294,12 +1073,6 @@ namespace PSI {
 				}
 			}
 
-			// // 内存映射建立好了，此时可以关闭文件了, Put This into Final
-			// close(fd_r);
-			// // 解除映射
-			// munmap(addr_r, lenr);
-			
-			// std::cout << "Receiver hash outputs computed\n";
 			timer.setTimePoint("Receiver hash outputs computed");
 
 			///////////////// Receive hash outputs from sender and compute PSI ///////////////////
@@ -1327,13 +1100,7 @@ namespace PSI {
 					}
 				}
 			}
-			
-			// if (psi == 100) {
-			// 	std::cout << "Receiver intersection computed - correct!\n";
-			// }
-			// else{
 			std::cout << "Receiver intersection computed"<< psi <<"- correct!\n";
-			// }
 			timer.setTimePoint("Receiver intersection computed");
 			
 			
