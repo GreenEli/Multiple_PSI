@@ -58,8 +58,6 @@ void runSenderOffline() {
 	Endpoint ep(ios, ip, EpMode::Server, "test-psi");
 	Channel ch = ep.addChannel();
 
-	// All_senderSize=senderSize1+senderSize2;
-	// senderSize2=All_senderSize;
 	vector<block> senderSet(All_senderSize); 
 	//-------------delete----------delete----------delete------------
 	PRNG prng(oc::toBlock(123));//means a random feed in "123".
@@ -85,8 +83,6 @@ void runReceiverOffline() {
 	IOService ios;
 	Endpoint ep(ios, ip, EpMode::Client, "test-psi");
 	Channel ch = ep.addChannel();
-
-	// All_receiverSize=receiverSize1+receiverSize2;
 
 	vector<block> receiverSet(All_receiverSize); 
 	PRNG prng0(oc::toBlock(123));//means a random feed in "123".
@@ -191,9 +187,6 @@ int main(int argc, char** argv) {
 		<< " -ip     ip address (and port).\n"
 		;
 	} else {
-		// All_senderSize=senderSize1+senderSize2;
-		// All_receiverSize=receiverSize1+receiverSize2;
-		// height=Float*height;
 		if (cmd.get<u64>("r") == 0) {
 			runSenderOffline();
 		} else if (cmd.get<u64>("r") == 1) {
